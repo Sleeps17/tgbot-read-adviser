@@ -2,6 +2,7 @@ package event_consumer
 
 import (
 	"log"
+	"sync"
 	"time"
 
 	"tgbot-read-adviser/internal/events"
@@ -13,15 +14,15 @@ type Consumer struct {
 	batchSize int
 }
 
-func New(fetcher events.Fetcher, processor events.Processor, batchSize int) Consumer {
-	return Consumer{
+func New(fetcher events.Fetcher, processor events.Processor, batchSize int) *Consumer {
+	return &Consumer{
 		fetcher:   fetcher,
 		processor: processor,
 		batchSize: batchSize,
 	}
 }
 
-func (c Consumer) Start() error {
+func (c *Consumer) Start() error {
 	for {
 		gotEvents, err := c.fetcher.Fetch(c.batchSize)
 		if err != nil {
@@ -45,15 +46,20 @@ func (c Consumer) Start() error {
 }
 
 func (c *Consumer) handleEvents(events []events.Event) error {
-	for _, event := range events {
-		log.Printf("got new event: %s", event.Text)
+	var wg sync.WaitGroup
+	for i := range events {
+		wg.Add(1)
+		log.Printf("got new event: %s", events[i].Text)
+		go func(i int) {
+			defer wg.Done()
+			if err := c.processor.Process(events[i]); err != nil {
 
-		if err := c.processor.Process(event); err != nil {
-			log.Printf("can't handle event: %s", err.Error())
+				log.Printf("can't handle event: %s", err.Error())
 
-			continue
-		}
+				return
+			}
+		}(i)
 	}
-
+	wg.Wait()
 	return nil
 }
