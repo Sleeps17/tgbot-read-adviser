@@ -1,0 +1,7 @@
+env: "local" #local, prod, dev
+storage_path: "./storage/storage.db"
+logs_path: "./logs/logs.out"
+bot_config:
+  tg_bot_host: "api.telegram.org"
+  tg_bot_token: "6847453437:AAF9WafIBOGGyxxvyP9bA5e0FdDkBntNvhw"
+  batch_size: 100
