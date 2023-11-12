@@ -4,20 +4,21 @@ services:
     build: ./
     command: ./wait-for-postgres.sh db ./telegram-bot
     depends_on:
-     - db
+      - db
     environment:
       - CONFIG_PATH=./config/local.yaml
-      - POSTGRES_USER=tgbot_user
-      - DB_PASSWORD=Pavel19122004
-      - POSTGRES_DB=tgbot_db
-      - POSTGRES_PASSWORD=Pavel19122004
+      - POSTGRES_USER=example_user
+      - DB_PASSWORD=example_password
+      - POSTGRES_DB=example_db
+      - POSTGRES_PASSWORD=example_password
   db:
     restart: always
     image: postgres:latest
     environment:
-      - POSTGRES_USER=tgbot_user
-      - POSTGRES_DB=tgbot_db
-      - POSTGRES_PASSWORD=Pavel19122004
+      - CONFIG_PATH=./config/local.yaml
+      - POSTGRES_USER=example_user
+      - POSTGRES_DB=example_db
+      - POSTGRES_PASSWORD=example_password
     volumes:
       - /storage/postgres_data:/var/lib/postgresql/data
     ports:
