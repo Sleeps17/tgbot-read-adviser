@@ -1,5 +1,5 @@
     # Игнорировать файл config.yaml
-    /config/local.yaml
+    ~/Projects/tgbot-read-adviser/config/local.yaml
 
     # Игнорировать логи
     /logs/
