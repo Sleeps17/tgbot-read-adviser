@@ -1,0 +1,11 @@
+env: "local" #local, prod, dev
+db_type: "postgres"
+logs_path: "./logs/logs.out"
+bot_config:
+  tg_bot_host: "api.telegram.org"
+  tg_bot_token: "example_token"
+  batch_size: 100
+data_base_config:
+  db_name: "example_db_name"
+  user_name: "example_user"
+  password: "example_password"
