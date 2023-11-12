@@ -1,4 +1,0 @@
-time=2023-11-11T00:27:03.087+06:00 level=INFO source=/home/pasha/Projects/tgbot-read-adviser/cmd/main.go:19 msg="the logger is successfully configured"
-time=2023-11-11T00:27:03.087+06:00 level=INFO source=/home/pasha/Projects/tgbot-read-adviser/cmd/main.go:31 msg="the event_processor is successfully configured"
-time=2023-11-11T00:27:03.087+06:00 level=INFO source=/home/pasha/Projects/tgbot-read-adviser/cmd/main.go:34 msg="the consumer is successfully configured"
-time=2023-11-11T00:27:03.087+06:00 level=INFO source=/home/pasha/Projects/tgbot-read-adviser/cmd/main.go:36 msg="service started"

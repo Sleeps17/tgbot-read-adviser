@@ -1,7 +1,11 @@
 env: "local" #local, prod, dev
-storage_path: "./storage/storage.db"
+db_type: "postgres"
 logs_path: "./logs/logs.out"
 bot_config:
   tg_bot_host: "api.telegram.org"
   tg_bot_token: "6847453437:AAF9WafIBOGGyxxvyP9bA5e0FdDkBntNvhw"
   batch_size: 100
+data_base_config:
+  db_name: "tgbot_db"
+  user_name: "tgbot_user"
+  password: "Pavel19122004"

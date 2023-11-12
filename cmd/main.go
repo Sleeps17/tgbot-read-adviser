@@ -1,15 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"log/slog"
 	"os"
+	"tgbot-read-adviser/internal/storage/postgresql"
 
 	tgClient "tgbot-read-adviser/internal/clients/telegram"
 	"tgbot-read-adviser/internal/config"
 	"tgbot-read-adviser/internal/consumer/event_consumer"
 	"tgbot-read-adviser/internal/events/telegram"
-	"tgbot-read-adviser/internal/storage/sqlite"
 )
 
 func main() {
@@ -18,10 +19,22 @@ func main() {
 	logger := setupLogger(cfg)
 	logger.Info("the logger is successfully configured")
 
-	s, err := sqlite.New(cfg.StoragePath)
+	dbConfig, ok := cfg.DataBaseConfig.(map[string]interface{})
+	if !ok {
+		log.Fatal("can't convert config")
+	}
+
+	s, err := postgresql.New(
+		fmt.Sprintf("host=db port=5432 user=%s dbname=%s password=%s sslmode=disable",
+			dbConfig["user_name"].(string),
+			dbConfig["db_name"].(string),
+			dbConfig["password"].(string),
+		),
+	)
 	if err != nil {
 		logger.Error("failed to create storage: ", slog.String("[ERR]", err.Error()))
-		os.Exit(0)
+		fmt.Println(err)
+		os.Exit(170)
 	}
 
 	eventsProcessor := telegram.New(

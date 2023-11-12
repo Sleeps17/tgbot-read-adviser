@@ -1,0 +1,10 @@
+    # Игнорировать файл config.yaml
+    /config/local.yaml
+
+    # Игнорировать логи
+    /logs/
+
+    # Игнорировать временные файлы
+    /bin/
+    /storage/postgres_data/
+    /storage/storage.db

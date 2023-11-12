@@ -1,12 +1,11 @@
-package sqlite
+package postgresql
 
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
-
-	_ "github.com/mattn/go-sqlite3"
-
+	_ "github.com/lib/pq"
 	"tgbot-read-adviser/internal/storage"
 )
 
@@ -14,9 +13,8 @@ type Storage struct {
 	db *sql.DB
 }
 
-// New creates new SQLite storage.
-func New(path string) (*Storage, error) {
-	db, err := sql.Open("sqlite3", path)
+func New(connStr string) (*Storage, error) {
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("can't open database: %w", err)
 	}
@@ -33,25 +31,23 @@ func New(path string) (*Storage, error) {
 	return &s, nil
 }
 
-// Save saves page to storage.
 func (s *Storage) Save(ctx context.Context, p *storage.Page) error {
-	q := `INSERT INTO pages (url, user_name) VALUES (?, ?)`
-
-	if _, err := s.db.ExecContext(ctx, q, p.URL, p.UserName); err != nil {
+	q := `INSERT INTO pages(url, user_name) VALUES($1,$2)`
+	_, err := s.db.ExecContext(ctx, q, p.URL, p.UserName)
+	if err != nil {
 		return fmt.Errorf("can't save page: %w", err)
 	}
 
 	return nil
 }
 
-// PickRandom picks random page from storage.
 func (s *Storage) PickRandom(ctx context.Context, userName string) (*storage.Page, error) {
-	q := `SELECT url FROM pages WHERE user_name = ? ORDER BY RANDOM() LIMIT 1`
+	q := `SELECT url FROM pages WHERE user_name = $1 ORDER BY RANDOM() LIMIT 1`
 
 	var url string
 
 	err := s.db.QueryRowContext(ctx, q, userName).Scan(&url)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, storage.ErrNoSavedPages
 	}
 	if err != nil {
@@ -64,46 +60,41 @@ func (s *Storage) PickRandom(ctx context.Context, userName string) (*storage.Pag
 	}, nil
 }
 
-// Remove removes page from storage.
 func (s *Storage) Remove(ctx context.Context, page *storage.Page) error {
-	q := `DELETE FROM pages WHERE url = ? AND user_name = ?`
-	if _, err := s.db.ExecContext(ctx, q, page.URL, page.UserName); err != nil {
+	q := `DELETE FROM pages WHERE url = $1 && user_name = $2`
+	_, err := s.db.ExecContext(ctx, q, page.UserName, page.URL)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		return storage.ErrNoSavedPages
+	}
+	if err != nil {
+		return fmt.Errorf("can't remove page: %w", err)
 	}
 
 	return nil
 }
 
 func (s *Storage) All(ctx context.Context, userName string) ([]*storage.Page, error) {
-	query := `SELECT url FROM pages WHERE user_name = ?`
-
-	rows, err := s.db.QueryContext(ctx, query, userName)
+	q := `SELECT url FROM pages WHERE user_name = $1`
+	rows, err := s.db.QueryContext(ctx, q, userName)
 	if err != nil {
-		return nil, fmt.Errorf("can't get all urls: %w", err)
+		return nil, fmt.Errorf("can't get all pages: %w", err)
 	}
 
+	result := make([]*storage.Page, 0, 4)
 	var url string
-	pages := make([]*storage.Page, 0, 4)
 
-	length := 0
 	for rows.Next() {
 		if err := rows.Scan(&url); err != nil {
-			return nil, fmt.Errorf("can't scan rows: %w", err)
+			return nil, fmt.Errorf("cna't scan data from rows: %w", err)
 		}
-
-		pages = append(pages, &storage.Page{URL: url, UserName: userName})
-		length++
+		result = append(result, &storage.Page{URL: url, UserName: userName})
 	}
 
-	if length == 0 {
-		return nil, storage.ErrNoSavedPages
-	}
-
-	return pages, nil
+	return result, nil
 }
 
 func (s *Storage) IsExists(ctx context.Context, page *storage.Page) (bool, error) {
-	q := `SELECT COUNT(*) FROM pages WHERE url = ? AND user_name = ?`
+	q := `SELECT COUNT(*) FROM pages WHERE url = $1 AND user_name = $2`
 
 	var count int
 
@@ -115,7 +106,7 @@ func (s *Storage) IsExists(ctx context.Context, page *storage.Page) (bool, error
 }
 
 func (s *Storage) init(ctx context.Context) error {
-	q := `CREATE TABLE IF NOT EXISTS pages (url TEXT, user_name TEXT)`
+	q := `CREATE TABLE IF NOT EXISTS pages(url TEXT, user_name TEXT)`
 
 	_, err := s.db.ExecContext(ctx, q)
 	if err != nil {
