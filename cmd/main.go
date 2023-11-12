@@ -34,7 +34,7 @@ func main() {
 	if err != nil {
 		logger.Error("failed to create storage: ", slog.String("[ERR]", err.Error()))
 		fmt.Println(err)
-		os.Exit(170)
+		os.Exit(0)
 	}
 
 	eventsProcessor := telegram.New(
