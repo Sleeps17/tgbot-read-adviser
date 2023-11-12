@@ -1,1 +1,4 @@
 config/local.yaml
+.idea/workspace.xml
+storage/postgres_data
+storage/storage.db
