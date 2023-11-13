@@ -15,6 +15,6 @@ const (
 	msgSaved          = "Saved! 👌"
 	msgAlreadyExists  = "You have already have this page in your list 🤗"
 	msgDeleted        = "Deleted 💀"
-	msgNoThisPage     = "You don't have this page in your list"
-	msgEmptyList      = "Your pages list is empty"
+	msgNoThisPage     = "You don't have this page in your list 🎯"
+	msgEmptyList      = "Your pages list is empty 🧩"
 )

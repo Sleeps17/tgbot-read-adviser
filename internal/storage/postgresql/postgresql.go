@@ -61,11 +61,17 @@ func (s *Storage) PickRandom(ctx context.Context, userName string) (*storage.Pag
 }
 
 func (s *Storage) Remove(ctx context.Context, page *storage.Page) error {
-	q := `DELETE FROM pages WHERE url = $1 && user_name = $2`
-	_, err := s.db.ExecContext(ctx, q, page.UserName, page.URL)
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
+	isExist, err := s.IsExists(ctx, page)
+	if err != nil {
+		fmt.Errorf("can't check exists file: %w", err)
+	}
+
+	if !isExist {
 		return storage.ErrNoSavedPages
 	}
+
+	q := `DELETE FROM pages WHERE url = $1 AND user_name = $2`
+	_, err = s.db.ExecContext(ctx, q, page.URL, page.UserName)
 	if err != nil {
 		return fmt.Errorf("can't remove page: %w", err)
 	}
@@ -82,12 +88,18 @@ func (s *Storage) All(ctx context.Context, userName string) ([]*storage.Page, er
 
 	result := make([]*storage.Page, 0, 4)
 	var url string
+	i := 0
 
 	for rows.Next() {
 		if err := rows.Scan(&url); err != nil {
 			return nil, fmt.Errorf("cna't scan data from rows: %w", err)
 		}
 		result = append(result, &storage.Page{URL: url, UserName: userName})
+		i++
+	}
+
+	if i == 0 {
+		return nil, storage.ErrNoSavedPages
 	}
 
 	return result, nil

@@ -1,5 +1,8 @@
 config/local.yaml
-.idea/workspace.xml
+
+.idea
+
 storage/postgres_data
 storage/storage.db
+
 docker-compose.yml

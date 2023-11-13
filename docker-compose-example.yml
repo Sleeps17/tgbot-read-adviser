@@ -6,20 +6,19 @@ services:
     depends_on:
       - db
     environment:
-      - CONFIG_PATH=./config/local.yaml
+      - CONFIG_PATH=./config/example.yaml
       - POSTGRES_USER=example_user
-      - DB_PASSWORD=example_password
       - POSTGRES_DB=example_db
       - POSTGRES_PASSWORD=example_password
   db:
     restart: always
     image: postgres:latest
     environment:
-      - CONFIG_PATH=./config/local.yaml
+      - CONFIG_PATH=./config/example.yaml
       - POSTGRES_USER=example_user
       - POSTGRES_DB=example_db
       - POSTGRES_PASSWORD=example_password
     volumes:
       - /storage/postgres_data:/var/lib/postgresql/data
     ports:
-      - '5436:5432'
+      - '5434:5432'

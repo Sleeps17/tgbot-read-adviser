@@ -9,7 +9,6 @@ import (
 
 type Config struct {
 	Env            string `yaml:"env"`
-	DBType         string `yaml:"db_type"`
 	LogsPath       string `yaml:"logs_path"`
 	BotConfig      `yaml:"bot_config"`
 	DataBaseConfig `yaml:"data_base_config"`
@@ -28,7 +27,9 @@ type SQLiteConfig struct {
 }
 
 type PostgresqlConfig struct {
-	DBName   string `yaml:"db_name"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Name     string `yaml:"name"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 }

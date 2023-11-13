@@ -25,9 +25,11 @@ func main() {
 	}
 
 	s, err := postgresql.New(
-		fmt.Sprintf("host=db port=5432 user=%s dbname=%s password=%s sslmode=disable",
+		fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+			dbConfig["host"].(string),
+			dbConfig["port"].(string),
 			dbConfig["user_name"].(string),
-			dbConfig["db_name"].(string),
+			dbConfig["name"].(string),
 			dbConfig["password"].(string),
 		),
 	)
