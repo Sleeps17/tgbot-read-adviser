@@ -5,7 +5,11 @@ const msgHelp = `I can save and keep you pages. Also I can offer you them to rea
 In order to save the page, just send me al link to it.
 
 In order to get a random page from your list, send me command /rnd.
-Caution! After that, this page will be removed from your list!`
+
+In order to remove a page from your list, send me command /remove and link on this page.
+
+In order to get all pages from your list? send me command /all.
+`
 
 const msgHello = "Hi there! 👾\n\n" + msgHelp
 
